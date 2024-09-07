@@ -1,6 +1,83 @@
-{% extends 'base.html' %}
-{% block head %} {% endblock %}
-
-{% block body %} 
-<h1>Hello Mrudul 2</h1>
-{% endblock %}
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        form {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .task-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .timestamp {
+            font-size: 0.8em;
+            color: #888;
+        }
+        #deletebutton{
+            background-color: rgb(227, 33, 33);
+        }
+    </style>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <form action="{{ url_for('add') }}" method="post">
+        <input type="text" name="task" placeholder="Enter a new task" required>
+        <button type="submit">Add</button>
+    </form>
+    <ul>
+        {% if todos %}
+            {% for todo in todos %}
+            <li>
+                <div class="task-info">
+                    <span class="{{ 'completed' if todo.completed else '' }}">{{ todo.task }}</span>
+                    <span class="timestamp">Added on: {{ todo.created_at.strftime('%d-%m-%Y %I:%M:%S %p') }} IST</span>
+                </div>
+                <div>
+                    <a href="{{ url_for('complete', id=todo.id) }}"><button>Toggle</button></a>
+                    <a href="{{ url_for('delete', id=todo.id) }}"><button id = "deletebutton">Delete</button></a>
+                </div>
+            </li>
+            {% endfor %}
+        {% else %}
+            <li>No tasks yet. Add a task to get started!</li>
+        {% endif %}
+    </ul>
+</body>
+</html>
