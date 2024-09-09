@@ -1,4 +1,3 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,7 +70,7 @@
                 </div>
                 <div>
                     <a href="{{ url_for('complete', id=todo.id) }}"><button>Toggle</button></a>
-                    <a href="{{ url_for('delete', id=todo.id) }}"><button id = "deletebutton">Delete</button></a>
+                    <a href="{{ url_for('delete', id=todo.id) }}"><button id="deletebutton">Delete</button></a>
                 </div>
             </li>
             {% endfor %}
