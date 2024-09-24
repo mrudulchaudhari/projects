@@ -6,10 +6,16 @@
     <title>To-Do List</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            color: #2c3e50;
         }
         form {
             display: flex;
@@ -18,64 +24,128 @@
         input[type="text"] {
             flex-grow: 1;
             padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
         }
         button {
             padding: 10px 20px;
-            background-color: #4CAF50;
+            background-color: #3498db;
             color: white;
             border: none;
             cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #2980b9;
         }
         ul {
             list-style-type: none;
             padding: 0;
         }
         li {
+            margin-bottom: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        .completed {
-            text-decoration: line-through;
-            color: #888;
         }
         .task-info {
-            display: flex;
-            flex-direction: column;
+            flex-grow: 1;
+            margin-left: 15px;
         }
         .timestamp {
             font-size: 0.8em;
-            color: #888;
+            color: #7f8c8d;
         }
-        #deletebutton{
-            background-color: rgb(227, 33, 33);
+        .completed-time {
+            color: #2ecc71;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #7f8c8d;
+        }
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .update-btn {
+            background-color: #2ecc71;
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+        }
+        input[type="checkbox"] {
+            transform: scale(1.5);
+            margin-right: 10px;
+        }
+        .inline-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
     </style>
 </head>
 <body>
     <h1>To-Do List</h1>
+
     <form action="{{ url_for('add') }}" method="post">
         <input type="text" name="task" placeholder="Enter a new task" required>
-        <button type="submit">Add</button>
+        <button type="submit">Add Task</button>
     </form>
+
+    <h2>Pending Tasks</h2>
     <ul>
-        {% if todos %}
-            {% for todo in todos %}
+        {% if pending_todos %}
+            {% for todo in pending_todos %}
             <li>
+                <form action="{{ url_for('complete', id=todo.id) }}" method="post" class="inline-form">
+                    <input type="checkbox" onchange="this.form.submit()">
+                </form>
                 <div class="task-info">
-                    <span class="{{ 'completed' if todo.completed else '' }}">{{ todo.task }}</span>
+                    <span>{{ todo.task }}</span>
                     <span class="timestamp">Added on: {{ todo.created_at.strftime('%d-%m-%Y %I:%M:%S %p') }} IST</span>
                 </div>
-                <div>
-                    <a href="{{ url_for('complete', id=todo.id) }}"><button>Toggle</button></a>
-                    <a href="{{ url_for('delete', id=todo.id) }}"><button id="deletebutton">Delete</button></a>
+                <div class="task-actions">
+                    <form action="{{ url_for('update', id=todo.id) }}" method="post" class="inline-form">
+                        <input type="text" name="task" value="{{ todo.task }}" required>
+                        <button type="submit" class="update-btn">Update</button>
+                    </form>
+                    <form action="{{ url_for('delete', id=todo.id) }}" method="post">
+                        <button type="submit" class="delete-btn">Delete</button>
+                    </form>
                 </div>
             </li>
             {% endfor %}
         {% else %}
-            <li>No tasks yet. Add a task to get started!</li>
+            <li>No pending tasks. Add a task to get started!</li>
+        {% endif %}
+    </ul>
+
+    <h2>Completed Tasks</h2>
+    <ul>
+        {% if completed_todos %}
+            {% for todo in completed_todos %}
+            <li>
+                <form action="{{ url_for('complete', id=todo.id) }}" method="post" class="inline-form">
+                    <input type="checkbox" checked onchange="this.form.submit()">
+                </form>
+                <div class="task-info">
+                    <span class="completed">{{ todo.task }}</span>
+                    <span class="timestamp">Added on: {{ todo.created_at.strftime('%d-%m-%Y %I:%M:%S %p') }} IST</span>
+                    {% if todo.completed_at %}
+                        <span class="timestamp completed-time">Completed on: {{ todo.completed_at.strftime('%d-%m-%Y %I:%M:%S %p') }} IST</span>
+                    {% endif %}
+                </div>
+                <form action="{{ url_for('delete', id=todo.id) }}" method="post">
+                    <button type="submit" class="delete-btn">Delete</button>
+                </form>
+            </li>
+            {% endfor %}
+        {% else %}
+            <li>No completed tasks yet.</li>
         {% endif %}
     </ul>
 </body>
